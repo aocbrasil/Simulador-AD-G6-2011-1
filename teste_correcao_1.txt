@@ -1,0 +1,140 @@
+0.0: Inicializacao do simulador;
+0.0: Item 0 entra na fila 1
+0.0: Item 0 entra em servico 1
+1.1215844995958197: Item 0 sai do servico 1 e ENTRA FILA 2
+FILA 2 [ 0, ] 
+FILA 1 [  ] 
+1.1215844995958197: Item 0 ENTRA NO SERVICO 2
+2.2863211313411314: Item 1 entra na fila 1
+2.2863211313411314: Item 0 interrompido!!!!
+
+tam fila 2 = 1
+
+2.2863211313411314: Item 1 entra em servico 1
+4.355664450813597: Item 2 entra na fila 1
+4.584959017357118: Item 1 sai do servico 1 e ENTRA FILA 2
+FILA 2 [ 0,1, ] 
+FILA 1 [ 2, ] 
+4.584959017357118: Item 2 entra em servico 1
+4.9007251505805876: Item 2 sai do servico 1 e ENTRA FILA 2
+FILA 2 [ 0,1,2, ] 
+FILA 1 [  ] 
+4.9007251505805876: Item 0 ENTRA NO SERVICO 2
+4.983532572231375: Item 3 entra na fila 1
+4.983532572231375: Item 0 interrompido!!!!
+
+tam fila 2 = 3
+
+4.983532572231375: Item 3 entra em servico 1
+5.442019661088896: Item 3 sai do servico 1 e ENTRA FILA 2
+FILA 2 [ 0,1,2,3, ] 
+FILA 1 [  ] 
+5.442019661088896: Item 0 ENTRA NO SERVICO 2
+5.945346203119193: Item 0 SAI DO SERVICO 2 e sistema
+===================
+ITEM 0;
+Rodada: 0;
+W1: 0.0;
+TS1 :1.1215844995958197;
+W2: 3.0728911080969774;
+TS2: 1.7508705954263961;
+N1: 0;
+Nq1: 0;
+N2: 0;
+Nq2: 0
+====================
+5.945346203119193: Item 1 ENTRA NO SERVICO 2
+7.372208608023284: Item 1 SAI DO SERVICO 2 e sistema
+===================
+ITEM 1;
+Rodada: 1;
+W1: 0.0;
+TS1 :2.2986378860159866;
+W2: 1.3603871857620753;
+TS2: 1.4268624049040906;
+N1: 0;
+Nq1: 0;
+N2: 1;
+Nq2: 0
+====================
+7.372208608023284: Item 2 ENTRA NO SERVICO 2
+10.063921635315582: Item 4 entra na fila 1
+10.063921635315582: Item 2 interrompido!!!!
+
+tam fila 2 = 2
+
+10.063921635315582: Item 4 entra em servico 1
+10.491508253182703: Item 4 sai do servico 1 e ENTRA FILA 2
+FILA 2 [ 2,3,4, ] 
+FILA 1 [  ] 
+10.491508253182703: Item 2 ENTRA NO SERVICO 2
+11.11116004282258: Item 2 SAI DO SERVICO 2 e sistema
+===================
+ITEM 2;
+Rodada: 1;
+W1: 0.22929456654352087;
+TS1 :0.3157661332234696;
+W2: 2.899070075309817;
+TS2: 3.3113648169321745;
+N1: 1;
+Nq1: 0;
+N2: 0;
+Nq2: 1
+====================
+11.11116004282258: Item 3 ENTRA NO SERVICO 2
+11.2959439871558: Item 3 SAI DO SERVICO 2 e sistema
+===================
+ITEM 3;
+Rodada: 1;
+W1: 0.0;
+TS1 :0.4584870888575212;
+W2: 5.669140381733683;
+TS2: 0.18478394433322087;
+N1: 0;
+Nq1: 0;
+N2: 3;
+Nq2: 2
+====================
+11.2959439871558: Item 4 ENTRA NO SERVICO 2
+11.535540852331199: Item 4 SAI DO SERVICO 2 e sistema
+===================
+ITEM 4;
+Rodada: 1;
+W1: 0.0;
+TS1 :0.4275866178671208;
+W2: 0.8044357339730972;
+TS2: 0.23959686517539858;
+N1: 0;
+Nq1: 0;
+N2: 2;
+Nq2: 1
+====================
+12.586972729352928: Item 5 entra na fila 1
+12.586972729352928: Item 5 entra em servico 1
+13.195761916988614: Item 6 entra na fila 1
+13.642276253972215: Item 7 entra na fila 1
+14.338792599829397: Item 5 sai do servico 1 e ENTRA FILA 2
+FILA 2 [ 5, ] 
+FILA 1 [ 6,7, ] 
+14.338792599829397: Item 6 entra em servico 1
+14.659518321899792: Item 6 sai do servico 1 e ENTRA FILA 2
+FILA 2 [ 5,6, ] 
+FILA 1 [ 7, ] 
+14.659518321899792: Item 7 entra em servico 1
+15.223244893094295: Item 7 sai do servico 1 e ENTRA FILA 2
+FILA 2 [ 5,6,7, ] 
+FILA 1 [  ] 
+15.223244893094295: Item 5 ENTRA NO SERVICO 2
+15.319117863089815: Item 5 SAI DO SERVICO 2 e sistema
+===================
+ITEM 5;
+Rodada: 1;
+W1: 0.0;
+TS1 :1.751819870476469;
+W2: 0.8844522932648982;
+TS2: 0.09587296999552031;
+N1: 0;
+Nq1: 0;
+N2: 0;
+Nq2: 0
+====================

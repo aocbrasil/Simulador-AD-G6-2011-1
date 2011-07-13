@@ -1,0 +1,95 @@
+Trabalho de AD - 2010/2 - Simulador de eventos
+
+Em anexo se encontram os resultados da criação do trabalho de simulação realizado pelo grupo:
+
+Fernando Boaretto
+Luiz Gustavo
+Rodrigo Martins
+Rodrigo Rocco
+
+Descrição das partes:
+
+-------------------------------------------------------------------
+- simuladorAD.jar : Executável Java do simulador.
+
+Modo de execução:
+java -jar simulador.jar <parametros>
+
+Se executarmos sem parâmetros, o seguinte "help" aparece:
+
+Uso correto: java -jar simulador.jar <ro> <mi> <ttrans> <nrod> <trod> <om>
+        ro: Taxa ro
+        mi: Taxa mi
+        ttrans: Total de partidas transientes
+        nrod: Numero de rodadas
+        trod: Tamanho da rodada
+        om: Omitir fase transiente (true|false)
+
+Formato da saída: Uma linha por saída de freguês do sistema, com o resultado final da linha, no formato:
+
+<idEntrada>;<idRodada>;<tempoFilaEspera1>;<tempoServico1>;<tempoFilaEspera2>;<tempoServico2>;<itensFila1>;<itensFilaEsperaFila1>;<itensFila2>;<itensFilaEsperaFila2>
+
+<idEntrada> - ID sequencial que o fregues recebe quando entra no sistema
+<idRodada> - ID da rodada. A rodada transiente tem ID 0.
+<tempoFila1> - Tempo que o freguês passou na fila de espera da Fila 1
+<temposervico1> - Tempo que o freguês passou sendo servido no primeiro serviço
+<tempoFila2> - Tempo que o freguês passou na fila de espera da Fila 2
+<temposervico2> - Tempo que o freguês passou sendo servido no segundo serviço
+<itensFila1> - Quantidade de fregueses que haviam na fila de espera da fila 1 e um provável cliente em serviço a partir da fila 1 quando este freguês entrou no sistema.
+<itensFilaEsperaFila1> - Quantidade de fregueses que haviam na fila de espera da fila 1 quando este freguês entrou no sistema.
+<itensFila2> - Quantidade de fregueses que haviam na fila de espera da fila 2 e um provável cliente em serviço a partir da fila 2 quando este freguês entrou no sistema.
+<itensFilaEsperaFila2> - Quantidade de fregueses que haviam na fila de espera da fila 2 quando este freguês entrou no sistema.
+
+Exemplo de execução: 
+java -jar simuladorAD.jar fcfs fcfs 0.9 1 5 2 3 false false
+
+Descrição desta execução:
+Rodar o simulador com ambas as filas em disciplina FCFS, com ocupação (ro) igual a 0.9, tempo médio de serviço (mi) igual a 1 por segundo, tamanho da rodada transiente igual a 5, e mais 2 rodadas com 3 fregueses em cada. A fase transiente não será omitida da saída e não estamos em modo de depuração de TimeLine.
+
+Resultado desta execução:
+1;0;0.0;0.7849705322476663;0.42402001728973904;0.5707978832248894;0;0;0;0
+2;0;0.702106895371598;0.42402001728973904;0.5707978832248894;0.128739248551915;1;0;0;0
+3;0;0.02353260318659567;1.07538653355149;0.0;0.20000762481435164;0;0;1;0
+4;0;0.0;0.24854969839479013;0.5052492524353682;0.10331804722586746;0;0;0;0
+5;0;0.036758306863569956;0.5052492524353682;0.10331804722586746;0.29395736961576624;1;0;0;0
+6;1;0.0;6.906326365777748;3.094468082675874;4.123009782904948;0;0;0;0
+7;1;6.182816540029892;1.0661004091522344;11.786218925089472;0.8096744059225642;1;0;0;0
+8;1;7.088262251728954;1.1756493781635555;12.665895706818223;1.0268332137252472;2;1;0;0
+9;2;4.145318586861649;0.0852472617304656;13.607481658813004;1.825764939956251;3;2;0;0
+10;2;3.9381303332999664;0.08963913431791681;17.011966594336045;1.3137186822329028;4;3;0;0
+11;2;3.7312265279952026;0.31369298747575414;18.011992289093193;0.7366530958573421;5;4;0;0
+
+-------------------------------------------------------------------
+- calcularResultados.pl : Script perl que consolida a saída do simulador em resultados analisáveis.
+
+Modo de execução:
+./calcularResultados.pl <arquivoDeEntrada> <constanteIC>
+<arquivoDeEntrada> é o arquivo que foi gerado pelo simulador, no formato descrito anteriormente.
+<constanteIC> é a constante do Intervalo de Confiança a ser calculado, retirado da tabela. Para 95%, utiliza-se 1.96.
+
+Formato da saída: A saída sairá no seguinte formato:
+
+W1;<valorW1>;<icW1>
+S1;<valorS1>;<icS1>
+W2;<valorW2>;<icW2>
+S2;<valorS2>;<icS2>
+N1;<valorN1>;<icN1>
+Nq1;<valorNq1>;<icNq1>
+N2;<valorN2>;<icN2>
+Nq2;<valorNq2>;<icNq2>
+VarW1;<valorVarW1>;<icVarW1>
+VarW2;<valorVarW2>;<icVarW2>
+
+Exemplo de execução:
+./calcularResultados.pl resultadoSimulacao.txt 1.96
+
+W1;1.28975417630114;0.296331846843535
+S1;1.16734685404547;0.168071988921919
+W2;6.83048826638364;1.79735205442677
+S2;0.878170110558992;0.125078998916879
+N1;0.888297872340426;0.140900689821201
+Nq1;0.425531914893617;0.0999750602189716
+N2;2.9468085106383;0.485819505347808
+Nq2;2.61170212765957;0.466553241314962
+VarW1;4.29736618317776;1.75000112634274
+VarW2;158.092770881873;71.7413791239325

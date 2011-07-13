@@ -1,0 +1,194 @@
+package simulator;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.PriorityQueue;
+import java.util.Random;
+
+import simulator.util.ExponentialRatioGenerator;
+
+public class Simulator 
+{
+	private static int FIRST_QUEUE_ID = 1;
+	private static int SECOND_QUEUE_ID = 2;
+	
+	//initialization parameters
+	private final float ro;
+	private final float mi;
+	private final int transientFaseSize;
+	private final int numberOfRounds;
+	private final int roundSize;
+	private final boolean hideTransientFase;
+	private final ItemQueue queue1;
+	private final ItemQueue queue2;
+	private final Random randon;
+	private Item itemInService = null;
+	private final ArrayList<Double> w1s = new ArrayList<Double>();
+	private final ArrayList<Double> w2s = new ArrayList<Double>();
+	
+	public Simulator(float ro, float mi, int transientFaseSize, int numberOfRounds, int roundSize, boolean hideTransientFase)
+	{
+		this.ro = ro;
+		this.mi = mi;
+		this.transientFaseSize = transientFaseSize;
+		this.numberOfRounds = numberOfRounds;
+		this.roundSize = roundSize;
+		this.hideTransientFase = hideTransientFase;
+		this.queue1 = new ItemQueue(FIRST_QUEUE_ID);
+		this.queue2 = new ItemQueue(SECOND_QUEUE_ID);
+		this.randon = new Random(System.currentTimeMillis());
+	}
+	
+	public void begin() throws IOException
+	{
+		
+//		fileWriter = new FileWriter(new File("/Documents and Settings/rocco/Desktop/"+parametros.getFila1().getClass().getName()+"_"+parametros.getRo()+".txt"));
+
+		PriorityQueue<Event> eventQueue = new PriorityQueue<Event>(10, new EventComparator());
+		
+		double lambda = ro / 2;
+		RoundConfig currentRound = new RoundConfig(0);
+		
+		Item item1 = new Item(0);
+		Event firstEvent = new Event(item1, Event.TYPE_ENTER_IN_QUEUE_1, 0);
+		eventQueue.add(firstEvent);
+		
+		double currentTime = 0;
+		while (!eventQueue.isEmpty()) 
+		{
+			Event currentEvent = eventQueue.remove();
+			currentTime = currentEvent.getTime();
+
+			if (Event.TYPE_ENTER_IN_QUEUE_1 == currentEvent.getType()) 
+			{
+				Item item = currentEvent.getItem();
+				item.setQueueId(FIRST_QUEUE_ID);
+				item.setQueue1ArriveTime(currentTime);
+				item.setNq1(queue1.size());
+				item.setNq2(queue2.size());
+				item.setN1(queue1.size() + ((itemInService!=null)&&(FIRST_QUEUE_ID == itemInService.getQueueId())?1:0));
+				item.setN2(queue2.size() + ((itemInService!=null)&&(SECOND_QUEUE_ID == itemInService.getQueueId())?1:0));
+				
+				if (itemInService != null &&  SECOND_QUEUE_ID == itemInService.getQueueId()) 
+				{
+					eventQueue.remove(new Event(itemInService, 0, 0));
+					queue2.addOnTop(itemInService);
+					itemInService = null;
+				}
+				queue1.add(item);
+				eventQueue.add(new Event(new Item(item.getId()+1), Event.TYPE_ENTER_IN_QUEUE_1, getNextEventTime(currentTime, lambda)));
+			} 
+			else 
+			{
+				if (Event.TYPE_ENTER_IN_SERVICE_1 == currentEvent.getType()) 
+				{
+					Item item = currentEvent.getItem();
+					item.setWaitingTimeQueue1(currentTime-item.getQueue1ArriveTime());
+					w1s.add(item.getWaitingTimeQueue1());
+					itemInService = item;
+					eventQueue.add(new Event(item, Event.TYPE_ENTER_IN_QUEUE_2, getNextEventTime(currentTime, mi)));
+				}
+				else if (Event.TYPE_ENTER_IN_QUEUE_2 == currentEvent.getType()) 
+				{
+					Item item = currentEvent.getItem();
+					if (FIRST_QUEUE_ID == item.getQueueId()) 
+					{
+						item.setQueueId(SECOND_QUEUE_ID);
+						item.setTimeInService1(currentTime-(item.getQueue1ArriveTime()+item.getWaitingTimeQueue1()));
+					} 
+					else 
+					{
+						// interruption occurs
+						item.addTimeInService2(currentTime-item.getServico2ArriveTime());
+					}
+					item.setQueue2ArriveTime(currentTime);
+					itemInService = null;
+					queue2.add(item);
+				} 
+				else if (Event.TYPE_ENTER_IN_SERVICE_2 == currentEvent.getType()) 
+				{
+					Item item = currentEvent.getItem();
+					item.addWaitingTimeQueue2(currentTime-item.getQueue2ArriveTime());
+					item.setServico2ArriveTime(currentTime);
+					w2s.add(item.getWaitingTimeQueue2());
+					itemInService = item;
+					eventQueue.add(new Event(item, Event.TYPE_EXIT_OF_SYSTEM, getNextEventTime(currentTime, mi)));
+				} 
+				else if (Event.TYPE_EXIT_OF_SYSTEM == currentEvent.getType()) 
+				{
+					Item item = currentEvent.getItem();
+					item.addTimeInService2(currentTime-item.getServico2ArriveTime());
+					itemInService = null;
+					/*
+					 * Esconde rodadas transientes
+					 */
+					if ((currentRound.getId() != 0) || (!hideTransientFase))
+					{
+						logCsv(String.valueOf(item.getId()), String.valueOf(currentRound.getId()), String.valueOf(item.getWaitingTimeQueue1()), 
+								String.valueOf(item.getTimeInService1()), String.valueOf(item.getWaitingTimeQueue2()), 
+								String.valueOf(item.getTimeInService2()), String.valueOf(item.getN1()), String.valueOf(item.getNq1()), 
+								String.valueOf(item.getN2()), String.valueOf(item.getNq2()));
+
+					//logCsv("round: "+String.valueOf(currentRound.getId()), item.toString());
+					}
+					
+					currentRound.incRoundItens();
+					if (currentRound.getId() == 0) 
+					{
+						if (currentRound.getRoundItens() >= transientFaseSize) {
+							// Testes de fase transiente nao executam rodadas
+							if (numberOfRounds == 0) break;
+							currentRound = new RoundConfig(1);
+						}
+					} else {
+						if (currentRound.getRoundItens() >= roundSize) {
+							/*
+							 * Parte para a proxima rodada
+							 */
+							if (currentRound.getId() < numberOfRounds) {
+								currentRound = new RoundConfig(currentRound.getId()+1);
+							} else {
+								/*
+								 * Termino do processamento
+								 */
+								break;
+							}
+						}
+					}
+					
+				}
+			}
+			if (itemInService == null) 
+			{
+				if (!queue1.isEmpty()) 
+				{
+					Item item = queue1.remove(0);
+					eventQueue.add(new Event(item, Event.TYPE_ENTER_IN_SERVICE_1, currentTime));
+				} 
+				else if (!queue2.isEmpty()) 
+				{
+					Item item = queue2.remove(0);
+					eventQueue.add(new Event(item, Event.TYPE_ENTER_IN_SERVICE_2, currentTime));
+				}
+			}
+		}
+	}
+
+	private double getNextEventTime(double currentTime, double ratio) 
+	{
+		return currentTime + ExponentialRatioGenerator.generate(randon.nextDouble(), ratio);
+	}
+
+	private void logCsv(String... parameters) throws IOException 
+	{
+		String resultado = "";
+		for (String parameter : parameters) 
+		{
+			resultado += parameter + ";";
+		}
+		
+		resultado = resultado.substring(0, resultado.length()-1);
+//		fileWriter.append(resultado+"\r\n");
+		System.out.println(resultado);
+	}
+}
